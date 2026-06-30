@@ -4,9 +4,9 @@ import httpx
 from app.settings import get_settings
 
 API = "https://api.replicate.com/v1"
-# Text-to-video model run via the models endpoint (no explicit version needed).
-# Confirm/adjust the model slug against the live Replicate catalog before real runs.
-REPLICATE_MODEL = "minimax/video-01"
+# Model run via the models endpoint (no explicit version needed).
+# NOTE: imagen-4-fast is a text-to-IMAGE model — output is an image, not a video.
+REPLICATE_MODEL = "google/imagen-4-fast"
 
 
 def _headers() -> dict:
@@ -51,10 +51,11 @@ def poll_video(prediction_id: str) -> dict:
 
 
 def download_video(url: str, prediction_id: str) -> str:
-    """Save the rendered clip to the local output folder; return the path."""
+    """Save the rendered asset to the local output folder; return the path."""
     out_dir = Path(get_settings().video_output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    dest = out_dir / f"{prediction_id}.mp4"
+    ext = Path(url.split("?")[0]).suffix or ".bin"
+    dest = out_dir / f"{prediction_id}{ext}"
     with httpx.stream("GET", url, timeout=120, follow_redirects=True) as r:
         r.raise_for_status()
         with open(dest, "wb") as f:
