@@ -12,7 +12,7 @@ vi.mock("./api", () => ({
 describe("App", () => {
   it("generates a post from the brief", async () => {
     render(<App />);
-    fireEvent.change(screen.getByLabelText(/brief/i), { target: { value: "launch" } });
+    fireEvent.change(screen.getByLabelText(/what are we saying/i), { target: { value: "launch" } });
     fireEvent.click(screen.getByRole("button", { name: /generate post/i }));
     await waitFor(() => expect(screen.getByText("Generated post")).toBeInTheDocument());
   });

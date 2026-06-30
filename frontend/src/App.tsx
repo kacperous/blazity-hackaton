@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { generate, submitVideo, pollVideo, publish } from "./api";
+import "./App.css";
 
 export default function App() {
   const [brief, setBrief] = useState("");
@@ -9,64 +10,210 @@ export default function App() {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [status, setStatus] = useState("");
   const [postUrl, setPostUrl] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
   async function onGenerate() {
-    setStatus("Generating post...");
-    const r = await generate(brief, examples.split("\n").filter(Boolean));
-    setPost(r.post);
-    setCheck(r.brand_voice_check);
-    setStatus("");
+    setBusy(true);
+    setError("");
+    setStatus("Listening for your voice…");
+    try {
+      const r = await generate(brief, examples.split("\n").filter(Boolean));
+      setPost(r.post);
+      setCheck(r.brand_voice_check);
+      setStatus("");
+    } catch (e) {
+      setError(`Couldn't draft the post — ${(e as Error).message}`);
+      setStatus("");
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function onVideo() {
-    setStatus("Submitting video...");
-    const { job_id } = await submitVideo(post);
-    setStatus("Rendering video...");
-    for (let i = 0; i < 60; i++) {
-      const s = await pollVideo(job_id);
-      if (s.status === "done" && s.url) { setVideoUrl(s.url); setStatus(""); return; }
-      if (s.status === "failed") { setStatus("Video failed"); return; }
-      await new Promise((res) => setTimeout(res, 3000));
+    setBusy(true);
+    setError("");
+    setStatus("Storyboarding…");
+    try {
+      const { job_id } = await submitVideo(post);
+      setStatus("Rolling film — this takes a moment…");
+      for (let i = 0; i < 60; i++) {
+        const s = await pollVideo(job_id);
+        if (s.status === "done" && s.url) {
+          setVideoUrl(s.url);
+          setStatus("");
+          return;
+        }
+        if (s.status === "failed") {
+          setError("The render fell apart. Try again.");
+          setStatus("");
+          return;
+        }
+        await new Promise((res) => setTimeout(res, 3000));
+      }
+      setError("The render timed out.");
+      setStatus("");
+    } catch (e) {
+      setError(`Video failed — ${(e as Error).message}`);
+      setStatus("");
+    } finally {
+      setBusy(false);
     }
-    setStatus("Video timed out");
   }
 
   async function onPublish() {
     if (!videoUrl) return;
-    setStatus("Publishing...");
-    const r = await publish(videoUrl, post);
-    setPostUrl(r.post_url);
-    setStatus("");
+    setBusy(true);
+    setError("");
+    setStatus("Sending it live…");
+    try {
+      const r = await publish(videoUrl, post);
+      setPostUrl(r.post_url);
+      setStatus("");
+    } catch (e) {
+      setError(`Publish failed — ${(e as Error).message}`);
+      setStatus("");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
-    <main style={{ maxWidth: 640, margin: "2rem auto", fontFamily: "sans-serif" }}>
-      <h1>AI Content Tool</h1>
-      <label htmlFor="brief">Brief</label>
-      <textarea id="brief" value={brief} onChange={(e) => setBrief(e.target.value)} rows={3} style={{ width: "100%" }} />
-      <label htmlFor="examples">Example posts (one per line)</label>
-      <textarea id="examples" value={examples} onChange={(e) => setExamples(e.target.value)} rows={4} style={{ width: "100%" }} />
-      <button onClick={onGenerate}>Generate post</button>
+    <div className="studio">
+      <header className="masthead">
+        <div className="mast-kicker">Atelier · AI Content Studio</div>
+        <h1 className="mast-title">
+          Write once.
+          <br />
+          <em>Sound like you.</em>
+        </h1>
+        <p className="mast-sub">
+          Hand it a brief and a few of your own posts. It returns a draft in your
+          voice, a short film to match, and one button to publish.
+        </p>
+        <div className="mast-edition">
+          No. 001
+          <br />
+          Brief → Film → Live
+        </div>
+      </header>
 
+      {/* 01 — Brief */}
+      <section className="stage" data-done={Boolean(post)}>
+        <div className="stage-num">01</div>
+        <div>
+          <p className="stage-head">The Brief</p>
+
+          <div className="field">
+            <label htmlFor="brief">
+              What are we saying?
+              <span className="hint">the gist, the angle, the call to action</span>
+            </label>
+            <textarea
+              id="brief"
+              value={brief}
+              rows={3}
+              placeholder="Launching our autumn capsule — warm, unhurried, a little nostalgic…"
+              onChange={(e) => setBrief(e.target.value)}
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="examples">
+              Your past posts
+              <span className="hint">one per line — so it learns your voice</span>
+            </label>
+            <textarea
+              id="examples"
+              value={examples}
+              rows={4}
+              placeholder={"We don't do loud. We do honest.\nSlow mornings, strong coffee, no apologies."}
+              onChange={(e) => setExamples(e.target.value)}
+            />
+          </div>
+
+          <button
+            className="btn btn-primary"
+            onClick={onGenerate}
+            disabled={busy || !brief.trim()}
+          >
+            Generate post <span className="arrow">→</span>
+          </button>
+        </div>
+      </section>
+
+      {/* 02 — Draft */}
       {post && (
-        <section>
-          <h2>Post</h2>
-          <p>{post}</p>
-          <p><em>Brand voice: {check}</em></p>
-          <button onClick={onVideo}>Generate video</button>
+        <section className="stage" data-done={Boolean(videoUrl)}>
+          <div className="stage-num">02</div>
+          <div>
+            <p className="stage-head">The Draft</p>
+            <article className="draft">
+              <p className="draft-body">{post}</p>
+              <div className="voice-note">
+                <span className="tag">Voice check</span>
+                <p>{check}</p>
+              </div>
+            </article>
+            <div className="stage-actions">
+              <button className="btn btn-ink" onClick={onVideo} disabled={busy}>
+                Generate video <span className="arrow">→</span>
+              </button>
+            </div>
+          </div>
         </section>
       )}
 
+      {/* 03 — Film */}
       {videoUrl && (
-        <section>
-          <h2>Video</h2>
-          <video src={videoUrl} controls style={{ width: "100%" }} />
-          <button onClick={onPublish}>Publish to Facebook</button>
+        <section className="stage" data-done={Boolean(postUrl)}>
+          <div className="stage-num">03</div>
+          <div>
+            <p className="stage-head">The Film</p>
+            <div className="film-frame">
+              <video src={videoUrl} controls />
+            </div>
+            <div className="stage-actions">
+              <button className="btn btn-primary" onClick={onPublish} disabled={busy}>
+                Publish to Facebook <span className="arrow">↗</span>
+              </button>
+            </div>
+          </div>
         </section>
       )}
 
-      {status && <p>{status}</p>}
-      {postUrl && <p>Published: <a href={postUrl}>{postUrl}</a></p>}
-    </main>
+      {/* 04 — Live */}
+      {(status || error || postUrl) && (
+        <section className="stage">
+          <div className="stage-num">04</div>
+          <div>
+            <p className="stage-head">Live</p>
+            {status && (
+              <span className="ticker">
+                <span className="dot" />
+                {status}
+              </span>
+            )}
+            {error && <p className="muted">{error}</p>}
+            {postUrl && (
+              <div className="published">
+                <span>●</span>
+                <span>
+                  Published —{" "}
+                  <a href={postUrl} target="_blank" rel="noreferrer">
+                    view the post
+                  </a>
+                </span>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      <footer className="colophon">
+        <span>Atelier — content, in your voice</span>
+        <span>Claude · fal.ai · Facebook</span>
+      </footer>
+    </div>
   );
 }
