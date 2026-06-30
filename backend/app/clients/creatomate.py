@@ -32,8 +32,11 @@ def render_branded(video_url: str, company: str, tagline: str) -> str:
         timeout=30,
     )
     resp.raise_for_status()
-    renders = resp.json()
-    return renders[0]["id"]
+    # v2 returns a single render object (v1 returned a list).
+    body = resp.json()
+    if isinstance(body, list):
+        body = body[0]
+    return body["id"]
 
 
 def poll_render(render_id: str) -> dict:
