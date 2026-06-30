@@ -257,6 +257,117 @@ textarea:focus {
 .saved-note {
   margin: 0.7rem 0 0;
 }
+
+/* ---------- Past-post cards ---------- */
+.post-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+.post-card {
+  background: #fffdf9;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: 0 12px 30px -24px rgba(26, 23, 20, 0.55);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.post-card:focus-within {
+  box-shadow: 0 16px 34px -22px rgba(224, 69, 31, 0.5);
+  border-color: var(--vermillion);
+}
+.post-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--line);
+}
+.post-card-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.post-card-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  flex: 1;
+}
+.post-card-meta strong {
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+.post-card-meta span {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.post-card-x {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--ink-faint);
+  padding: 0 0.2rem;
+  transition: color 0.2s;
+}
+.post-card-x:hover {
+  color: var(--vermillion);
+}
+.post-card-body {
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  padding: 0.85rem 0.95rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  flex: 1;
+  resize: none;
+}
+.post-card-body:focus {
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+}
+.post-card.add {
+  border-style: dashed;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 80px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition: color 0.2s, border-color 0.2s;
+}
+.post-card.add span {
+  font-size: 1.3rem;
+}
+.post-card.add:hover {
+  color: var(--vermillion-deep);
+  border-color: var(--vermillion);
+}
 .brand-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

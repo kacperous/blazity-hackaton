@@ -12,7 +12,7 @@ import "./App.css";
 
 export default function App() {
   const [brief, setBrief] = useState("");
-  const [examples, setExamples] = useState("");
+  const [examplesList, setExamplesList] = useState<string[]>([""]);
   const [post, setPost] = useState("");
   const [check, setCheck] = useState("");
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -32,13 +32,15 @@ export default function App() {
     try {
       const posts = await fetchExamples(10);
       if (posts.length) {
-        setExamples(posts.join("\n"));
+        setExamplesList(posts);
         setExamplesSource(`Pulled ${posts.length} posts from your Page`);
       } else {
-        setExamplesSource("No posts found on your Page — paste a few below");
+        setExamplesList([""]);
+        setExamplesSource("No posts found on your Page — add a few below");
       }
     } catch {
-      setExamplesSource("Couldn't reach your Page — paste a few below");
+      setExamplesList([""]);
+      setExamplesSource("Couldn't reach your Page — add a few below");
     } finally {
       setLoadingExamples(false);
     }
@@ -48,12 +50,21 @@ export default function App() {
     loadExamples();
   }, [loadExamples]);
 
+  const updateExample = (i: number, val: string) =>
+    setExamplesList((xs) => xs.map((x, j) => (j === i ? val : x)));
+  const addExample = () => setExamplesList((xs) => [...xs, ""]);
+  const removeExample = (i: number) =>
+    setExamplesList((xs) => (xs.length > 1 ? xs.filter((_, j) => j !== i) : xs));
+
   async function onGenerate() {
     setBusy(true);
     setError("");
     setStatus("Listening for your voice…");
     try {
-      const r = await generate(brief, examples.split("\n").filter(Boolean));
+      const r = await generate(
+        brief,
+        examplesList.map((p) => p.trim()).filter(Boolean),
+      );
       setPost(r.post);
       setCheck(r.brand_voice_check);
       setStatus("");
@@ -188,21 +199,47 @@ export default function App() {
           </div>
 
           <div className="field">
-            <label htmlFor="examples">
+            <label>
               Your past posts
               <span className="hint">pulled from your Facebook Page — edit if you like</span>
             </label>
-            <textarea
-              id="examples"
-              value={examples}
-              rows={5}
-              placeholder={
-                loadingExamples
-                  ? "Reading your Page…"
-                  : "We don't do loud. We do honest.\nSlow mornings, strong coffee, no apologies."
-              }
-              onChange={(e) => setExamples(e.target.value)}
-            />
+
+            <div className="post-cards">
+              {examplesList.map((text, i) => (
+                <article className="post-card" key={i}>
+                  <header className="post-card-head">
+                    <span className="post-card-avatar">f</span>
+                    <div className="post-card-meta">
+                      <strong>BlazityHack</strong>
+                      <span>past post</span>
+                    </div>
+                    {examplesList.length > 1 && (
+                      <button
+                        type="button"
+                        className="post-card-x"
+                        onClick={() => removeExample(i)}
+                        aria-label="Remove example"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </header>
+                  <textarea
+                    className="post-card-body"
+                    value={text}
+                    rows={5}
+                    placeholder={loadingExamples ? "Reading your Page…" : "Paste a past post…"}
+                    onChange={(e) => updateExample(i, e.target.value)}
+                  />
+                </article>
+              ))}
+
+              <button type="button" className="post-card add" onClick={addExample}>
+                <span>+</span>
+                add a post
+              </button>
+            </div>
+
             <div className="examples-meta">
               <span className="muted-mono">
                 {loadingExamples ? "● pulling from your Page…" : examplesSource}
