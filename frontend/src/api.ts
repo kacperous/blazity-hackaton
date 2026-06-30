@@ -46,8 +46,8 @@ export const pollCompose = async (renderId: string): Promise<ComposeStatus> => {
   return r.json() as Promise<ComposeStatus>;
 };
 
-export const publish = (video_url: string, description: string) =>
-  post<PublishResult>("/api/publish", { video_url, description });
+export const publish = (message: string, link: string) =>
+  post<PublishResult>("/api/publish", { message, link });
 
 export const fetchExamples = async (limit = 10): Promise<string[]> => {
   const r = await fetch(`${BASE}/api/examples?limit=${limit}`);

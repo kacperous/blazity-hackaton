@@ -136,7 +136,7 @@ export default function App() {
     setError("");
     setStatus("Sending it live…");
     try {
-      const r = await publish(finalUrl, post);
+      const r = await publish(post, finalUrl);
       setPostUrl(r.post_url);
       setStatus("");
     } catch (e) {
