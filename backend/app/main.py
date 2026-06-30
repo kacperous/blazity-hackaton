@@ -17,6 +17,9 @@ app.include_router(generate_router.router)
 from app.routers import video as video_router
 app.include_router(video_router.router)
 
+from app.routers import publish as publish_router
+app.include_router(publish_router.router)
+
 
 @app.get("/api/health")
 def health():
