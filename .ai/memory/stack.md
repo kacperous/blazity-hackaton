@@ -1,17 +1,31 @@
 # Stack
 
-The technical stack is not yet chosen. No `package.json`, lockfile, or framework
-config exists in the repository.
+Frontend-first web app. Stack chosen; application code not yet scaffolded.
 
-## Known
+## Chosen
 
-- Git for version control; single initial commit so far.
-- Atlas (`@blazity-atlas/core`) manages the AI workspace; run it via
+- **Language:** TypeScript
+- **Frontend:** React via Vite (SPA, lightweight dev server + build)
+- **AI provider:** Claude (Anthropic) — Anthropic SDK (`@anthropic-ai/sdk`).
+  Default to the latest, most capable Claude models for product AI features.
+- **Version control:** Git.
+
+## Tooling notes
+
+- Atlas (`@blazity-atlas/core`) manages the AI workspace; check health with
   `npx --yes @blazity-atlas/core@latest doctor`.
+- The Anthropic API key must never be exposed to the browser. Calls to Claude
+  must go through a server/proxy layer, not directly from the Vite client.
 
-## Unknowns (fill once chosen)
+## Expected commands (confirm once `package.json` exists)
 
-- Language(s) and runtime
-- Framework(s) and key libraries
-- Build, test, and run commands
-- AI/agent provider and SDK
+- Install: `npm install`
+- Dev server: `npm run dev` (Vite default)
+- Build: `npm run build`
+- Preview build: `npm run preview`
+
+## Unknowns (fill once scaffolded)
+
+- Backend/proxy layer for Claude calls (serverless function, small Node server, etc.)
+- Test framework (Vitest is the natural fit for Vite)
+- Key libraries (router, state, styling)

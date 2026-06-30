@@ -1,7 +1,13 @@
 # Architecture
 
-No application architecture exists yet. The repository contains only project
-metadata (README, LICENSE) and the Atlas AI workspace under `.ai/`.
+No application code yet. The repository holds project metadata (README,
+LICENSE) and the Atlas AI workspace under `.ai/`. The intended shape is below.
+
+## Intended shape
+
+- Vite + React (TypeScript) single-page app for the UI.
+- A server/proxy layer for Anthropic API calls — the API key must stay
+  server-side, never bundled into the browser client.
 
 ## Current layout
 
@@ -13,6 +19,6 @@ metadata (README, LICENSE) and the Atlas AI workspace under `.ai/`.
 
 ## Unknowns (fill once code lands)
 
-- Runtime and deployment model
+- Proxy/backend choice (serverless function vs. small Node server)
 - Service/module boundaries
-- Architectural invariants and constraints
+- Deployment target

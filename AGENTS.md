@@ -2,10 +2,12 @@
 
 ## What this repo is
 
-`blazity-hackaton` — an early-stage hackathon project. Today it is a scaffold:
-only README, LICENSE, and the Atlas AI workspace under `.ai/` exist; there is no
-application code yet. The intended product is an AI / agent application; concrete
-scope and tech stack are not yet decided. See `.ai/memory/` for stable context.
+`blazity-hackaton` — a hackathon project for the Blazity "AI for Content"
+challenge: a web app that uses AI to solve a content-management pain. Today it is
+a scaffold (README, LICENSE, and the Atlas AI workspace under `.ai/`); no
+application code yet. Stack is chosen — Vite + React (TypeScript) with Claude
+(Anthropic) for AI. The concrete content problem is not yet decided. See
+`.ai/memory/` for stable context.
 
 ## Structure
 
@@ -16,10 +18,14 @@ scope and tech stack are not yet decided. See `.ai/memory/` for stable context.
 
 ## Working rules
 
-- No stack is chosen yet — confirm language, framework, and run/test/build
-  commands before assuming them. Update `.ai/memory/stack.md` once decided.
-- There are no project-specific safe commands yet beyond Atlas tooling:
-  `npx --yes @blazity-atlas/core@latest doctor` checks workspace health.
+- Stack is Vite + React + TypeScript with the Anthropic SDK (Claude). The app
+  is not scaffolded yet — confirm exact run/test/build commands once
+  `package.json` exists; expected: `npm run dev` / `npm run build`.
+- Never expose the Anthropic API key to the browser. Claude calls go through a
+  server/proxy layer, not the Vite client.
+- Beyond Atlas tooling (`npx --yes @blazity-atlas/core@latest doctor`), no
+  project-specific safe commands are defined yet.
+- The content problem is undecided — do not invent product scope; confirm first.
 - Do not edit the `<!-- BEGIN/END ATLAS -->` managed block below by hand.
 - Keep durable docs depersonalized (see Atlas Documentation Rules below).
 
