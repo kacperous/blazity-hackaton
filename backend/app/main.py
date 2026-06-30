@@ -23,6 +23,9 @@ app.include_router(publish_router.router)
 from app.routers import examples as examples_router
 app.include_router(examples_router.router)
 
+from app.routers import compose as compose_router
+app.include_router(compose_router.router)
+
 
 @app.get("/api/health")
 def health():

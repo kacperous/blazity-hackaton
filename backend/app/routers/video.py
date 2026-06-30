@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from app.clients.falvideo import submit_video, poll_video
+from app.clients.replicate_video import submit_video, poll_video, download_video
 
 router = APIRouter()
 
@@ -26,6 +26,10 @@ def create_video(req: VideoRequest):
 @router.get("/api/video/{job_id}")
 def get_video(job_id: str):
     try:
-        return poll_video(job_id)
+        result = poll_video(job_id)
+        # When the render is ready, save a local copy and report its path.
+        if result["status"] == "done" and result.get("url"):
+            result["local_path"] = download_video(result["url"], job_id)
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"video poll failed: {e}")

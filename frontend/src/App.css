@@ -254,6 +254,24 @@ textarea:focus {
   margin-top: 1.6rem;
 }
 
+.saved-note {
+  margin: 0.7rem 0 0;
+}
+.brand-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-top: 1.6rem;
+}
+.brand-grid textarea {
+  resize: none;
+}
+@media (max-width: 620px) {
+  .brand-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .examples-meta {
   display: flex;
   justify-content: space-between;

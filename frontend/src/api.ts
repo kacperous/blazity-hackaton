@@ -11,7 +11,8 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 }
 
 export interface GenerateResult { post: string; brand_voice_check: string; }
-export interface VideoStatus { status: "pending" | "done" | "failed"; url: string | null; }
+export interface VideoStatus { status: "pending" | "done" | "failed"; url: string | null; local_path?: string; }
+export interface ComposeStatus { status: "pending" | "done" | "failed"; url: string | null; }
 export interface PublishResult { id: string; post_url: string; }
 
 export const generate = (brief: string, examples: string[]) =>
@@ -24,6 +25,15 @@ export const pollVideo = async (jobId: string): Promise<VideoStatus> => {
   const r = await fetch(`${BASE}/api/video/${jobId}`);
   if (!r.ok) throw new Error(`poll failed: ${r.status}`);
   return r.json() as Promise<VideoStatus>;
+};
+
+export const submitCompose = (video_url: string, company: string, tagline: string) =>
+  post<{ render_id: string }>("/api/compose", { video_url, company, tagline });
+
+export const pollCompose = async (renderId: string): Promise<ComposeStatus> => {
+  const r = await fetch(`${BASE}/api/compose/${renderId}`);
+  if (!r.ok) throw new Error(`compose poll failed: ${r.status}`);
+  return r.json() as Promise<ComposeStatus>;
 };
 
 export const publish = (video_url: string, description: string) =>
