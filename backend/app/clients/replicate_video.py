@@ -4,9 +4,9 @@ import httpx
 from app.settings import get_settings
 
 API = "https://api.replicate.com/v1"
-# Model run via the models endpoint (no explicit version needed).
-# NOTE: imagen-4-fast is a text-to-IMAGE model — output is an image, not a video.
-REPLICATE_MODEL = "google/imagen-4-fast"
+# Text-to-video model run via the models endpoint (no explicit version needed).
+# LTX-Video: fast + cheap T2V. Confirm slug against the live Replicate catalog.
+REPLICATE_MODEL = "lightricks/ltx-video"
 
 
 def _headers() -> dict:
