@@ -5,8 +5,8 @@ from app.settings import get_settings
 
 API = "https://api.replicate.com/v1"
 # Text-to-video model run via the models endpoint (no explicit version needed).
-# LTX-Video: fast + cheap T2V. Confirm slug against the live Replicate catalog.
-REPLICATE_MODEL = "lightricks/ltx-video"
+# minimax/video-01 — confirmed working; supports the models/predictions endpoint.
+REPLICATE_MODEL = "minimax/video-01"
 
 
 def _headers() -> dict:
