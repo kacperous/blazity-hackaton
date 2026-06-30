@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { generate, submitVideo, pollVideo, publish } from "./api";
+import { useState, useEffect, useCallback } from "react";
+import { generate, submitVideo, pollVideo, publish, fetchExamples } from "./api";
 import "./App.css";
 
 export default function App() {
@@ -12,6 +12,29 @@ export default function App() {
   const [postUrl, setPostUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [loadingExamples, setLoadingExamples] = useState(false);
+  const [examplesSource, setExamplesSource] = useState("");
+
+  const loadExamples = useCallback(async () => {
+    setLoadingExamples(true);
+    try {
+      const posts = await fetchExamples(10);
+      if (posts.length) {
+        setExamples(posts.join("\n"));
+        setExamplesSource(`Pulled ${posts.length} posts from your Page`);
+      } else {
+        setExamplesSource("No posts found on your Page — paste a few below");
+      }
+    } catch {
+      setExamplesSource("Couldn't reach your Page — paste a few below");
+    } finally {
+      setLoadingExamples(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadExamples();
+  }, [loadExamples]);
 
   async function onGenerate() {
     setBusy(true);
@@ -121,15 +144,32 @@ export default function App() {
           <div className="field">
             <label htmlFor="examples">
               Your past posts
-              <span className="hint">one per line — so it learns your voice</span>
+              <span className="hint">pulled from your Facebook Page — edit if you like</span>
             </label>
             <textarea
               id="examples"
               value={examples}
-              rows={4}
-              placeholder={"We don't do loud. We do honest.\nSlow mornings, strong coffee, no apologies."}
+              rows={5}
+              placeholder={
+                loadingExamples
+                  ? "Reading your Page…"
+                  : "We don't do loud. We do honest.\nSlow mornings, strong coffee, no apologies."
+              }
               onChange={(e) => setExamples(e.target.value)}
             />
+            <div className="examples-meta">
+              <span className="muted-mono">
+                {loadingExamples ? "● pulling from your Page…" : examplesSource}
+              </span>
+              <button
+                type="button"
+                className="link-btn"
+                onClick={loadExamples}
+                disabled={loadingExamples}
+              >
+                ↻ Refresh from Page
+              </button>
+            </div>
           </div>
 
           <button

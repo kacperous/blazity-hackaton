@@ -254,6 +254,39 @@ textarea:focus {
   margin-top: 1.6rem;
 }
 
+.examples-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+.muted-mono {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+.link-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--vermillion-deep);
+  padding: 0;
+  transition: color 0.2s;
+}
+.link-btn:hover:not(:disabled) {
+  color: var(--ink);
+}
+.link-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* ---------- Video ---------- */
 .film-frame {
   border: 1px solid var(--ink);

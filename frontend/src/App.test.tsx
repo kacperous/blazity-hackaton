@@ -7,6 +7,7 @@ vi.mock("./api", () => ({
   submitVideo: vi.fn(async () => ({ job_id: "j1" })),
   pollVideo: vi.fn(async () => ({ status: "done", url: "http://clip" })),
   publish: vi.fn(async () => ({ id: "v1", post_url: "http://fb/v1" })),
+  fetchExamples: vi.fn(async () => ["past post one", "past post two"]),
 }));
 
 describe("App", () => {

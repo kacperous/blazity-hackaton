@@ -28,3 +28,10 @@ export const pollVideo = async (jobId: string): Promise<VideoStatus> => {
 
 export const publish = (video_url: string, description: string) =>
   post<PublishResult>("/api/publish", { video_url, description });
+
+export const fetchExamples = async (limit = 10): Promise<string[]> => {
+  const r = await fetch(`${BASE}/api/examples?limit=${limit}`);
+  if (!r.ok) throw new Error(`examples failed: ${r.status}`);
+  const data = (await r.json()) as { examples: string[] };
+  return data.examples;
+};
