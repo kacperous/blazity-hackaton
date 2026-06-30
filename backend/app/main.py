@@ -14,6 +14,9 @@ app.add_middleware(
 from app.routers import generate as generate_router
 app.include_router(generate_router.router)
 
+from app.routers import video as video_router
+app.include_router(video_router.router)
+
 
 @app.get("/api/health")
 def health():
