@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from app.clients.facebook import publish_post
+from app.clients.facebook import publish_content
 
 router = APIRouter()
 
@@ -13,6 +13,6 @@ class PublishRequest(BaseModel):
 @router.post("/api/publish")
 def publish(req: PublishRequest):
     try:
-        return publish_post(req.message, req.link)
+        return publish_content(req.message, req.link)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"publish failed: {e}")
