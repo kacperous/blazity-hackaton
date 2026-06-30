@@ -1,35 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { generate, submitVideo, pollVideo, publish } from "./api";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [brief, setBrief] = useState("");
+  const [examples, setExamples] = useState("");
+  const [post, setPost] = useState("");
+  const [check, setCheck] = useState("");
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [status, setStatus] = useState("");
+  const [postUrl, setPostUrl] = useState("");
+
+  async function onGenerate() {
+    setStatus("Generating post...");
+    const r = await generate(brief, examples.split("\n").filter(Boolean));
+    setPost(r.post);
+    setCheck(r.brand_voice_check);
+    setStatus("");
+  }
+
+  async function onVideo() {
+    setStatus("Submitting video...");
+    const { job_id } = await submitVideo(post);
+    setStatus("Rendering video...");
+    for (let i = 0; i < 60; i++) {
+      const s = await pollVideo(job_id);
+      if (s.status === "done" && s.url) { setVideoUrl(s.url); setStatus(""); return; }
+      if (s.status === "failed") { setStatus("Video failed"); return; }
+      await new Promise((res) => setTimeout(res, 3000));
+    }
+    setStatus("Video timed out");
+  }
+
+  async function onPublish() {
+    if (!videoUrl) return;
+    setStatus("Publishing...");
+    const r = await publish(videoUrl, post);
+    setPostUrl(r.post_url);
+    setStatus("");
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <main style={{ maxWidth: 640, margin: "2rem auto", fontFamily: "sans-serif" }}>
+      <h1>AI Content Tool</h1>
+      <label htmlFor="brief">Brief</label>
+      <textarea id="brief" value={brief} onChange={(e) => setBrief(e.target.value)} rows={3} style={{ width: "100%" }} />
+      <label htmlFor="examples">Example posts (one per line)</label>
+      <textarea id="examples" value={examples} onChange={(e) => setExamples(e.target.value)} rows={4} style={{ width: "100%" }} />
+      <button onClick={onGenerate}>Generate post</button>
 
-export default App
+      {post && (
+        <section>
+          <h2>Post</h2>
+          <p>{post}</p>
+          <p><em>Brand voice: {check}</em></p>
+          <button onClick={onVideo}>Generate video</button>
+        </section>
+      )}
+
+      {videoUrl && (
+        <section>
+          <h2>Video</h2>
+          <video src={videoUrl} controls style={{ width: "100%" }} />
+          <button onClick={onPublish}>Publish to Facebook</button>
+        </section>
+      )}
+
+      {status && <p>{status}</p>}
+      {postUrl && <p>Published: <a href={postUrl}>{postUrl}</a></p>}
+    </main>
+  );
+}
