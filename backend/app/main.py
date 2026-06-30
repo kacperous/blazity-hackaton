@@ -11,6 +11,10 @@ app.add_middleware(
 )
 
 
+from app.routers import generate as generate_router
+app.include_router(generate_router.router)
+
+
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
